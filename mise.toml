@@ -1,0 +1,5 @@
+[tools]
+node = "26.13.0"
+
+[settings]
+activate_aggressive = true

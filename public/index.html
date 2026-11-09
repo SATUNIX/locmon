@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>LOCMON · Local monitor</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/fonts.css"><link rel="stylesheet" href="/vendor/proof/tokens.css">
+  <link rel="stylesheet" href="/vendor/proof/bundle.css"><link rel="stylesheet" href="/style.css">
+  <script src="/app.js" type="module"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="LOCMON home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0v24M0 12h24M4 4l16 16M4 20 20 4"/></svg><span>Local monitor</span></a>
+    <div class="top-meta"><span id="host">Connecting to host</span><span class="local-tag" id="listen-address">Local connection</span></div>
+    <button class="pf-btn pf-btn--sm" id="theme" aria-label="Switch to light theme">Light theme</button>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="title">
+      <div><p class="micro edition">System telemetry / local edition</p><h1 id="title">LOCMON<span class="wordmark-dot">.</span></h1></div>
+      <div class="hero-aside"><p class="micro">Your machine. At a glance.</p><span class="pf-tag" id="live-interval">Live / 2 seconds</span></div>
+    </section>
+    <div class="status-strip"><span id="connection" role="status">○ Connecting</span><span id="uptime">Uptime —</span><span id="kernel">Linux</span><span id="clock">Waiting for first sample</span></div>
+    <div class="view-controls">
+      <div class="control"><label for="average-window">Card average</label><select id="average-window"><option value="0">Current reading</option><option value="10">10 seconds</option><option value="30" selected>30 seconds</option><option value="60">1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select></div>
+      <div class="control chart-window-control"><label for="chart-window">Chart window <output id="window-value" for="chart-window">10 min</output></label><input type="range" id="chart-window" min="1" max="30" step="1" value="10" aria-label="Chart window in minutes"></div>
+      <div class="control"><label for="sample-interval">Sampling / all viewers</label><select id="sample-interval"><option value="1000">Every second</option><option value="2000" selected>Every 2 seconds</option><option value="5000">Every 5 seconds</option><option value="10000">Every 10 seconds</option><option value="30000">Every 30 seconds</option></select></div>
+      <button id="pause" class="pf-btn pf-btn--sm" aria-pressed="false">Pause view</button><span class="micro muted" id="history-note">Collecting history</span><span class="micro" id="settings-message" role="status"></span>
+    </div>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <div class="dashboard-bar"><span class="micro muted">Workspace / overview</span><div><span class="micro muted" id="layout-state">Layout saved on this device</span><button class="pf-btn pf-btn--sm" id="edit-layout" aria-pressed="false">Edit dashboard</button></div></div>
+    <div id="layout-editor" class="layout-editor" hidden><div><p class="micro">Arrange your workspace.</p><p>Drag card headers or use the arrow buttons. Change card widths, hide panels, or collapse their contents.</p></div><div id="visibility-options"></div><button class="pf-btn pf-btn--sm" id="reset-layout">Reset layout</button></div>
+    <div id="dashboard" class="dashboard">
+      <article class="widget stat-widget" data-widget="cpu-stat"><div class="widget-content" id="cpu-stat"></div></article>
+      <article class="widget stat-widget" data-widget="memory-stat"><div class="widget-content" id="memory-stat"></div></article>
+      <article class="widget stat-widget" data-widget="gpu-stat"><div class="widget-content" id="gpu-stat"></div></article>
+      <article class="widget stat-widget" data-widget="vram-stat"><div class="widget-content" id="vram-stat"></div></article>
+      <section class="widget" data-widget="inference"><div class="widget-content"><div class="panel-heading inference-heading"><div><span class="micro">Inference / throughput</span><h2>Tokens in motion.</h2></div><span class="micro muted" id="inference-coverage">Finding sources</span></div><div id="inference-stats" class="inference-stats"></div><p id="inference-basis" class="source-note"></p><figure class="inference-graph"><figcaption><span>Aggregate inference throughput</span><span class="legend">━ Decode <span class="muted">┄ Prefill</span></span></figcaption><canvas id="inference-chart" aria-label="Prefill and decode token throughput over the selected time window"></canvas><div class="axis micro"><span>10 min ago</span><span id="inference-scale">Tokens / sec</span></div></figure><div id="inference-sources"></div><details><summary>Recent completed requests</summary><div id="inference-recent" class="inference-recent"></div></details></div></section>
+      <section class="widget" data-widget="cpu-history"><div class="widget-content"><figure><figcaption><span>Processor & memory / raw</span><span class="legend">━ CPU <span class="muted">┄ RAM</span></span></figcaption><canvas id="cpu-chart" aria-label="CPU and memory usage history over the selected time window"></canvas><div class="axis micro"><span>10 min ago</span><span>Now / 0–100%</span></div></figure></div></section>
+      <section class="widget" data-widget="gpu-history"><div class="widget-content"><figure><figcaption><span>Graphics & video memory / raw</span><span class="legend">━ GPU <span class="muted">┄ VRAM</span></span></figcaption><canvas id="gpu-chart" aria-label="GPU and video memory usage history over the selected time window"></canvas><div class="axis micro"><span>10 min ago</span><span>Now / 0–100%</span></div></figure></div></section>
+      <section class="widget" data-widget="processor"><div class="widget-content"><div class="panel-heading"><span class="micro">Processor / per core</span><h2>Every core counts.</h2><p id="cpu-model" class="subtext">Reading processor</p></div><div class="core-grid" id="cores"></div><div class="panel-footer micro" id="load">Load averages —</div></div></section>
+      <section class="widget" data-widget="graphics"><div class="widget-content"><div class="panel-heading"><span class="micro">Graphics / engines</span><h2>Under the hood.</h2><p id="gpu-model" class="subtext">Reading graphics hardware</p></div><div id="gpu-detail" class="panel-body"></div></div></section>
+      <section class="widget" data-widget="storage"><div class="widget-content"><div class="section-heading"><div><span class="micro section-no">Storage / capacity & I/O</span><h2>Room to work.</h2></div><span class="micro muted" id="capacity-age">Reading capacity</span></div><div id="disks" class="disk-grid"></div><div id="disk-io" class="io-strip"></div></div></section>
+      <section class="widget" data-widget="thermals"><div class="widget-content"><div class="panel-heading"><span class="micro">Thermals / sensors</span><h2>Keep your cool.</h2><p class="subtext">Live CPU, GPU, storage and board sensors.</p></div><div id="thermal-summary" class="thermal-summary"></div><details><summary>All temperature sensors <span id="sensor-count"></span></summary><div id="temperatures" class="sensor-list"></div></details><details><summary>Fan speeds <span id="fan-count"></span></summary><div id="fans" class="sensor-list"></div></details></div></section>
+      <section class="widget" data-widget="network"><div class="widget-content"><div class="panel-heading"><span class="micro">Network & memory / resources</span><h2>In. Out. Available.</h2></div><div id="network" class="panel-body"></div><div class="memory-details" id="memory-detail"></div></div></section>
+    </div>
+  </main>
+  <footer><span class="micro">LOCMON / Local monitor / v1.0</span><span class="micro" id="footprint">Starting collector</span><span class="micro">Design system <a href="https://github.com/SATUNIX/proof" target="_blank" rel="noreferrer">Proof ↗</a></span></footer>
+</body></html>

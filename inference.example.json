@@ -1,0 +1,6 @@
+{
+  "journals": [
+    { "id": "local-llama", "unit": "llama-server.service", "model": "local-model" }
+  ],
+  "endpoints": []
+}
